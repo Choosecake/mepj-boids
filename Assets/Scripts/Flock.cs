@@ -21,7 +21,8 @@ public class Flock : MonoBehaviour
     private float squareAvoidanceRadius;
     public float SquareAvoidanceRadius { get { return squareAvoidanceRadius; } }
 
-
+    [SerializeField] private FlockAgent player;
+    
     void Start()
     {
         squareMaxSpeed = maxSpeed * maxSpeed;
@@ -35,6 +36,8 @@ public class Flock : MonoBehaviour
             newAgent.Initialize(this);
             agents.Add(newAgent);
         }
+        
+        agents.Add(player);
     }
 
     void Update()
@@ -43,13 +46,22 @@ public class Flock : MonoBehaviour
         {
             List<Transform> context = GetNearbyObjects(agent);
 
-
-            Vector2 move = behavior.CalculateMove(agent, context, this);
+            Vector2 move;
+            if (player)
+            {
+                move = behavior.CalculateMove(player, context, this);
+            }
+            else
+            {
+                move = behavior.CalculateMove(agent, context, this);
+            }
+            
             move *= driveFactor;
             if (move.sqrMagnitude > squareMaxSpeed)
             {
                 move = move.normalized * maxSpeed;
             }
+
             agent.Move(move);
         }
     }
